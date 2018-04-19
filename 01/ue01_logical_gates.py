@@ -5,14 +5,24 @@ def sigmoid(x):
     return 1 / (1 + np.exp(-x))
 
 
+# Trainingsdaten
+training_input = np.array([[0, 0],
+                           [0, 1],
+                           [1, 0],
+                           [1, 1]])
+training_output = np.array([[0, 0, 0],
+                            [0, 1, 1],
+                            [0, 1, 1],
+                            [1, 1, 0]])
+
 if __name__ == '__main__':
     input_set = np.array([[0, 0]])
 
-    weights_h = np.array([[20, 20, 20, -20], [20, 20, 20, -20]])
-    weights_o = np.array([[30, 1, 1], [1, 30, 1], [1, 1, 20], [1, 1, 20]])
+    weights_h = np.array(np.random.uniform(-0.1, 0.1, (2, 4)))
+    weights_o = np.array(np.random.uniform(-0.1, 0.1, (4, 3)))
 
-    bias_h = np.array([[-30, -10, -10, 30]])
-    bias_o = np.array([[-15, -15, -30]])
+    bias_h = np.array(np.random.uniform(-0.1, 0.1, (1, 4)))
+    bias_o = np.array(np.random.uniform(-0.1, 0.1, (1, 3)))
 
     hidden_layer = sigmoid(np.dot(weights_h.T, input_set.T) + bias_h.T)
     output_layer = sigmoid(np.dot(weights_o.T, hidden_layer) + bias_o.T)
