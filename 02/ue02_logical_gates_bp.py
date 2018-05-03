@@ -5,6 +5,14 @@ def sigmoid(x):
     return 1 / (1 + np.exp(-x))
 
 
+def sigmoid_derivative(x):
+    return sigmoid(x) * (1.0 - sigmoid(x))
+
+
+def mean_squared_error():
+    pass
+
+
 # Trainingsdaten
 training_input = np.array([[0, 0],
                            [0, 1],
