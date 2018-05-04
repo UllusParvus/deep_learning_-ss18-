@@ -7,6 +7,7 @@ def sigmoid(x):
 
 if __name__ == '__main__':
     input_set = np.array([[1, 1]])
+    print(input_set.shape)
 
     weights_h = np.array([[20, 20, 20, -20], [20, 20, 20, -20]])
     weights_o = np.array([[30, 1, 1], [1, 30, 1], [1, 1, 20], [1, 1, 20]])
