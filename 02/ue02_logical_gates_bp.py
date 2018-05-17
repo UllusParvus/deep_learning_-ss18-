@@ -1,6 +1,9 @@
 import numpy as np
 
-LEARNING_RATE = 0.1
+LEARNING_RATE = 0.4
+LOOP = 1000
+MSE_THRESHOLD = 0.01
+
 
 def sigmoid(x):
     return 1 / (1 + np.exp(-x))
@@ -34,11 +37,9 @@ if __name__ == '__main__':
     bias_h = np.array(np.random.uniform(-0.1, 0.1, (1, 4)))
     bias_o = np.array(np.random.uniform(-0.1, 0.1, (1, 3)))
 
-    hidden_layer = sigmoid(np.dot(weights_h.T, input_set.T) + bias_h.T)
-    output_layer = sigmoid(np.dot(weights_o.T, hidden_layer) + bias_o.T)
-
-    for i in range(0, 1000):
+    for i in range(0, LOOP):
         print('### Schritt ' + str(i + 1) + ' ###')
+        mse_sum = 0
         for j in range(0, training_input.shape[0]):
             input_set = np.array([training_input[j]])
             actual = np.array([training_output[j]])
@@ -51,7 +52,10 @@ if __name__ == '__main__':
 
             mse = mean_squared_error(A2, actual)
 
-            print('Vorhersage für ' + str(input_set) + ' --> ' + str(output_layer))
+            mse_sum += mse
+
+            print('Vorhersage für ' + str(input_set) + ':')
+            print(A2)
             print('MSE --> ' + str(mse))
 
             # output layer
@@ -72,11 +76,5 @@ if __name__ == '__main__':
             bias_h = bias_h - LEARNING_RATE * Delta_L_by_B1.T
             bias_o = bias_o - LEARNING_RATE * Delta_L_by_B2.T
 
-
-    '''
-    print(training_input.shape)
-    print('Input: ' + str(input_set[0]))
-    print('NN -> AND: ' + str(output_layer[0][0]))
-    print('NN -> OR: ' + str(output_layer[1][0]))
-    print('NN -> XOR: ' + str(output_layer[2][0]))
-    '''
+        if mse_sum < MSE_THRESHOLD:
+            break
