@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
 # Konfiguration 
-# momentum
-# rmsprop
-# ada_delta
+momentum = 0.9
+learning_rate = 0.001
+mini_batch_size = 10
+optimizer_type = 'sgd'
 
 import numpy as np
 import torch
@@ -21,10 +22,10 @@ if not os.path.exists(root):
 train_set = dset.MNIST(root=root, train=True, transform=trans, download=True)
 test_set = dset.MNIST(root=root, train=False, transform=trans, download=True)
 
-trainloader = torch.utils.data.DataLoader(train_set, batch_size=1,
+trainloader = torch.utils.data.DataLoader(train_set, batch_size=mini_batch_size,
                                           shuffle=True, num_workers=2)
 
-testloader = torch.utils.data.DataLoader(test_set, batch_size=1,
+testloader = torch.utils.data.DataLoader(test_set, batch_size=mini_batch_size,
                                          shuffle=False, num_workers=2)
 
 classes = np.arange(10) # classes from 0-9
@@ -82,10 +83,18 @@ net = Net()
 import torch.optim as optim
 
 criterion = nn.CrossEntropyLoss()
-optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 
+if optimizer_type == 'sgd':
+    optimizer = optim.SGD(net.parameters(), lr=learning_rate, momentum=momentum)
+elif optimizer_type == 'rms_prop':
+    optimizer = optim.RMSprop(net.parameters(), lr=learning_rate, momentum=momentum)
+elif optimizer_type == 'ada_delta':
+    optimizer = optim.Adadelta(net.parameters(), lr=learning_rate, rho=0.9, eps=1e-06, weight_decay=0)
+else:
+    # default sgd
+    optimizer = optim.SGD(net.parameters(), lr=learning_rate, momentum=momentum)
 
-for epoch in range(2):  # loop over the dataset multiple times
+for epoch in range(2):
 
     running_loss = 0.0
     for i, data in enumerate(trainloader, 0):
