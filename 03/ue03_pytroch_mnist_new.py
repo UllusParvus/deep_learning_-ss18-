@@ -16,8 +16,8 @@ import torch.optim as optim
 momentum = 0.9
 learning_rate = 0.001
 mini_batch_size = 10
-mini_batch_sizes = [1, 10, 50, 100, 500]
-optimizer_type = 'sgd'
+mini_batch_sizes = [1, 10, 50, 100]
+optimizer_type = 'rms_prop'
 
 trans = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5,), (1.0,))])
 
@@ -157,8 +157,11 @@ if __name__ == '__main__':
                     class_total[label] += 1
 
         for i in range(10):
+            if class_total[i] == 0:
+                class_total[i] = 0.00001
             print('Accuracy of %5s : %2d %%' % (
                 classes[i], 100 * class_correct[i] / class_total[i]))
+
 
         dataiter._shutdown_workers()
 

@@ -1,0 +1,309 @@
+Optimizer sgd, batch_size 1, learning_rate 0.001, momentum 0.9
+    5
+[1,  2000] loss: 1.807
+[1,  4000] loss: 0.435
+[1,  6000] loss: 0.257
+[1,  8000] loss: 0.242
+[1, 10000] loss: 0.188
+[1, 12000] loss: 0.152
+[1, 14000] loss: 0.152
+[1, 16000] loss: 0.125
+[1, 18000] loss: 0.141
+[1, 20000] loss: 0.147
+[1, 22000] loss: 0.128
+[1, 24000] loss: 0.106
+[1, 26000] loss: 0.099
+[1, 28000] loss: 0.108
+[1, 30000] loss: 0.119
+[1, 32000] loss: 0.098
+[1, 34000] loss: 0.105
+[1, 36000] loss: 0.106
+[1, 38000] loss: 0.103
+[1, 40000] loss: 0.107
+[1, 42000] loss: 0.087
+[1, 44000] loss: 0.080
+[1, 46000] loss: 0.080
+[1, 48000] loss: 0.087
+[1, 50000] loss: 0.078
+[1, 52000] loss: 0.081
+[1, 54000] loss: 0.076
+[1, 56000] loss: 0.082
+[1, 58000] loss: 0.066
+[1, 60000] loss: 0.080
+[2,  2000] loss: 0.076
+[2,  4000] loss: 0.064
+[2,  6000] loss: 0.071
+[2,  8000] loss: 0.059
+[2, 10000] loss: 0.068
+[2, 12000] loss: 0.085
+[2, 14000] loss: 0.056
+[2, 16000] loss: 0.065
+[2, 18000] loss: 0.067
+[2, 20000] loss: 0.049
+[2, 22000] loss: 0.063
+[2, 24000] loss: 0.058
+[2, 26000] loss: 0.061
+[2, 28000] loss: 0.059
+[2, 30000] loss: 0.045
+[2, 32000] loss: 0.068
+[2, 34000] loss: 0.052
+[2, 36000] loss: 0.063
+[2, 38000] loss: 0.054
+[2, 40000] loss: 0.065
+[2, 42000] loss: 0.064
+[2, 44000] loss: 0.047
+[2, 46000] loss: 0.066
+[2, 48000] loss: 0.055
+[2, 50000] loss: 0.053
+[2, 52000] loss: 0.048
+[2, 54000] loss: 0.062
+[2, 56000] loss: 0.063
+[2, 58000] loss: 0.059
+[2, 60000] loss: 0.055
+Finished Training
+GroundTruth:      7
+Predicted:      7
+Accuracy of the network on the 10000 test images: 98 %
+/home/christoph/ownCloud/HTWG/04_SS18/Deep_Learning_(Schall_Schambach)/Uebungen/deep_learning_-ss18-/03/ue03_pytroch_mnist_new.py:156: UserWarning: invalid index of a 0-dim tensor. This will be an error in PyTorch 0.5. Use tensor.item() to convert a 0-dim tensor to a Python number
+  class_correct[label] += c[i].item()
+Accuracy of     0 : 99 %
+Accuracy of     1 : 99 %
+Accuracy of     2 : 98 %
+Accuracy of     3 : 97 %
+Accuracy of     4 : 98 %
+Accuracy of     5 : 98 %
+Accuracy of     6 : 98 %
+Accuracy of     7 : 97 %
+Accuracy of     8 : 98 %
+Accuracy of     9 : 97 %
+cuda:0
+
+############################################################################################
+
+Optimizer sgd, batch_size 10, learning_rate 0.001, momentum 0.9
+    3
+[1,  2000] loss: 1.763
+[1,  4000] loss: 0.308
+[1,  6000] loss: 0.159
+[2,  2000] loss: 0.123
+[2,  4000] loss: 0.101
+[2,  6000] loss: 0.087
+Finished Training
+GroundTruth:      7
+Predicted:      7
+Accuracy of the network on the 10000 test images: 98 %
+Accuracy of     0 : 98 %
+Accuracy of     1 : 99 %
+Accuracy of     2 : 97 %
+Accuracy of     3 : 97 %
+Accuracy of     4 : 97 %
+Accuracy of     5 : 97 %
+Accuracy of     6 : 97 %
+Accuracy of     7 : 99 %
+Accuracy of     8 : 97 %
+Accuracy of     9 : 94 %
+cuda:0
+
+############################################################################################
+
+Optimizer sgd, batch_size 50, learning_rate 0.001, momentum 0.9
+    5
+Finished Training
+GroundTruth:      7
+Predicted:      7
+Accuracy of the network on the 10000 test images: 92 %
+Accuracy of     0 : 85 %
+Accuracy of     1 : 100 %
+Accuracy of     2 : 85 %
+Accuracy of     3 : 90 %
+Accuracy of     4 : 94 %
+Accuracy of     5 : 84 %
+Accuracy of     6 : 90 %
+Accuracy of     7 : 77 %
+Accuracy of     8 : 91 %
+Accuracy of     9 : 91 %
+cuda:0
+
+############################################################################################
+
+Optimizer sgd, batch_size 100, learning_rate 0.001, momentum 0.9
+    4
+Finished Training
+GroundTruth:      7
+Predicted:      7
+Accuracy of the network on the 10000 test images: 45 %
+Accuracy of     0 :  0 %
+Accuracy of     1 : 100 %
+Accuracy of     2 : 36 %
+Accuracy of     3 : 70 %
+Accuracy of     4 :  0 %
+Accuracy of     5 :  0 %
+Accuracy of     6 : 44 %
+Accuracy of     7 : 84 %
+Accuracy of     8 :  0 %
+Accuracy of     9 : 25 %
+cuda:0
+
+############################################################################################
+
+Optimizer sgd, batch_size 500, learning_rate 0.001, momentum 0.9
+    5
+Finished Training
+GroundTruth:      7
+Predicted:      3
+Accuracy of the network on the 10000 test images: 15 %
+Accuracy of     0 :  0 %
+Accuracy of     1 :  0 %
+Accuracy of     2 :  0 %
+Accuracy of     3 : 100 %
+Accuracy of     4 : 75 %
+Accuracy of     5 :  0 %
+Accuracy of     6 :  0 %
+Accuracy of     7 :  0 %
+Accuracy of     8 :  0 %
+Accuracy of     9 :  0 %
+EOFError
+
+/home/christoph/anaconda3/envs/deeplearning/bin/python /home/christoph/ownCloud/HTWG/04_SS18/Deep_Learning_(Schall_Schambach)/Uebungen/deep_learning_-ss18-/03/ue03_pytroch_mnist_new.py
+Optimizer rms_prop, batch_size 1, learning_rate 0.001, momentum 0.9
+    9
+[1,  2000] loss: 2.317
+[1,  4000] loss: 2.310
+[1,  6000] loss: 2.308
+[1,  8000] loss: 2.306
+[1, 10000] loss: 2.307
+[1, 12000] loss: 2.310
+[1, 14000] loss: 2.310
+[1, 16000] loss: 2.308
+[1, 18000] loss: 2.304
+[1, 20000] loss: 2.308
+[1, 22000] loss: 2.311
+[1, 24000] loss: 2.312
+[1, 26000] loss: 2.312
+[1, 28000] loss: 2.308
+[1, 30000] loss: 2.308
+[1, 32000] loss: 2.311
+[1, 34000] loss: 2.307
+[1, 36000] loss: 2.310
+[1, 38000] loss: 2.309
+[1, 40000] loss: 2.311
+[1, 42000] loss: 2.312
+[1, 44000] loss: 2.307
+[1, 46000] loss: 2.308
+[1, 48000] loss: 2.310
+[1, 50000] loss: 2.309
+[1, 52000] loss: 2.312
+[1, 54000] loss: 2.305
+[1, 56000] loss: 2.311
+[1, 58000] loss: 2.308
+[1, 60000] loss: 2.311
+[2,  2000] loss: 2.311
+[2,  4000] loss: 2.311
+[2,  6000] loss: 2.311
+[2,  8000] loss: 2.307
+[2, 10000] loss: 2.311
+[2, 12000] loss: 2.307
+[2, 14000] loss: 2.310
+[2, 16000] loss: 2.308
+[2, 18000] loss: 2.312
+[2, 20000] loss: 2.308
+[2, 22000] loss: 2.308
+[2, 24000] loss: 2.309
+[2, 26000] loss: 2.310
+[2, 28000] loss: 2.311
+[2, 30000] loss: 2.310
+[2, 32000] loss: 2.304
+[2, 34000] loss: 2.311
+[2, 36000] loss: 2.312
+[2, 38000] loss: 2.307
+[2, 40000] loss: 2.311
+[2, 42000] loss: 2.310
+[2, 44000] loss: 2.309
+[2, 46000] loss: 2.311
+[2, 48000] loss: 2.310
+[2, 50000] loss: 2.308
+[2, 52000] loss: 2.310
+[2, 54000] loss: 2.308
+[2, 56000] loss: 2.309
+[2, 58000] loss: 2.310
+[2, 60000] loss: 2.305
+Finished Training
+GroundTruth:      7
+Predicted:      1
+Accuracy of the network on the 10000 test images: 11 %
+/home/christoph/ownCloud/HTWG/04_SS18/Deep_Learning_(Schall_Schambach)/Uebungen/deep_learning_-ss18-/03/ue03_pytroch_mnist_new.py:156: UserWarning: invalid index of a 0-dim tensor. This will be an error in PyTorch 0.5. Use tensor.item() to convert a 0-dim tensor to a Python number
+  class_correct[label] += c[i].item()
+Accuracy of     0 :  0 %
+Accuracy of     1 : 100 %
+Accuracy of     2 :  0 %
+Accuracy of     3 :  0 %
+Accuracy of     4 :  0 %
+Accuracy of     5 :  0 %
+Accuracy of     6 :  0 %
+Accuracy of     7 :  0 %
+Accuracy of     8 :  0 %
+Accuracy of     9 :  0 %
+cuda:0
+
+############################################################################################
+
+Optimizer rms_prop, batch_size 10, learning_rate 0.001, momentum 0.9
+    0
+[1,  2000] loss: 0.464
+[1,  4000] loss: 0.320
+[1,  6000] loss: 0.315
+[2,  2000] loss: 0.308
+[2,  4000] loss: 0.323
+[2,  6000] loss: 0.308
+Finished Training
+GroundTruth:      7
+Predicted:      7
+Accuracy of the network on the 10000 test images: 93 %
+Accuracy of     0 : 95 %
+Accuracy of     1 : 93 %
+Accuracy of     2 : 93 %
+Accuracy of     3 : 93 %
+Accuracy of     4 : 94 %
+Accuracy of     5 : 96 %
+Accuracy of     6 : 96 %
+Accuracy of     7 : 95 %
+Accuracy of     8 : 91 %
+Accuracy of     9 : 68 %
+cuda:0
+Optimizer rms_prop, batch_size 50, learning_rate 0.001, momentum 0.9
+    5
+Finished Training
+GroundTruth:      7
+Predicted:      7
+Accuracy of the network on the 10000 test images: 96 %
+Accuracy of     0 : 100 %
+Accuracy of     1 : 100 %
+Accuracy of     2 : 100 %
+Accuracy of     3 : 100 %
+Accuracy of     4 : 100 %
+Accuracy of     5 : 92 %
+Accuracy of     6 : 100 %
+Accuracy of     7 : 90 %
+Accuracy of     8 : 100 %
+Accuracy of     9 : 95 %
+cuda:0
+
+############################################################################################
+
+Optimizer rms_prop, batch_size 100, learning_rate 0.001, momentum 0.9
+    7
+Finished Training
+GroundTruth:      7
+Predicted:      7
+Accuracy of the network on the 10000 test images: 97 %
+Accuracy of     0 : 100 %
+Accuracy of     1 : 90 %
+Accuracy of     2 : 90 %
+Accuracy of     3 : 100 %
+Accuracy of     4 : 100 %
+Accuracy of     5 : 100 %
+Accuracy of     6 : 100 %
+Accuracy of     7 : 92 %
+Accuracy of     8 : 100 %
+Accuracy of     9 : 91 %
+cuda:0
