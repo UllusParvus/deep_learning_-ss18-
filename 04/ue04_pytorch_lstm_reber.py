@@ -15,25 +15,13 @@ torch.manual_seed(1)
 def prepare_sequence(seq):
     return torch.tensor([seq], dtype=torch.float)
 
-# training_data = [
-#    ("The dog ate the apple".split(), ["DET", "NN", "V", "DET", "NN"]),
-#    ("Everybody read that book".split(), ["NN", "V", "DET", "NN"])
-# ]
-
-training_data = get_n_examples(500, 8)
-
-# word_to_ix = {}
-# for sent, tags in training_data:
-#     for word in sent:
-#         if word not in word_to_ix:
-#             word_to_ix[word] = len(word_to_ix)
-#print(word_to_ix)
-# tag_to_ix = {"DET": 0, "NN": 1, "V": 2}
-
-# These will usually be more like 32 or 64 dimensional.
-# We will keep them small, so we can see how the weights change as we train.
 EMBEDDING_DIM = 7
-HIDDEN_DIM = 1000
+HIDDEN_DIM = 12
+MINI_BATCH_SIZE = 1
+WORD_SIZE = 13
+LEARNING_RATE = 0.1
+
+training_data = get_n_examples(1000, WORD_SIZE)
 
 class LSTMTagger(nn.Module):
 
@@ -45,7 +33,7 @@ class LSTMTagger(nn.Module):
 
         # The LSTM takes word embeddings as inputs, and outputs hidden states
         # with dimensionality hidden_dim.
-        self.lstm = nn.LSTM(embedding_dim, hidden_dim)
+        self.lstm = nn.LSTM(embedding_dim, hidden_dim, batch_first=True)
 
         # The linear layer that maps from hidden state space to tag space
         self.hidden2tag = nn.Linear(hidden_dim, tagset_size)
@@ -56,23 +44,20 @@ class LSTMTagger(nn.Module):
         # Refer to the Pytorch documentation to see exactly
         # why they have this dimensionality.
         # The axes semantics are (num_layers, minibatch_size, hidden_dim)
-        return (torch.zeros(1, 8, self.hidden_dim),
-                torch.zeros(1, 8, self.hidden_dim))
+        return (torch.zeros(1, MINI_BATCH_SIZE, self.hidden_dim),
+                torch.zeros(1, MINI_BATCH_SIZE, self.hidden_dim))
 
     def forward(self, sentence):
-        # embeds = self.word_embeddings(sentence)
-        #print('embeds -> ' + str(embeds))
         lstm_out, self.hidden = self.lstm(sentence, self.hidden)
         tag_space = self.hidden2tag(lstm_out)
-        tag_scores = F.log_softmax(tag_space, dim=1)
-        return tag_scores
-
-#print('vocab size -> ' + str(len(word_to_ix)))
+        activation = F.sigmoid(tag_space)
+        # tag_scores = F.log_softmax(tag_space, dim=1)
+        return activation
 
 # model = LSTMTagger(EMBEDDING_DIM, HIDDEN_DIM, len(word_to_ix), len(tag_to_ix))
 model = LSTMTagger(EMBEDDING_DIM, HIDDEN_DIM, 7, 7)
 loss_function = nn.MSELoss()
-optimizer = optim.SGD(model.parameters(), lr=1.01)
+optimizer = optim.SGD(model.parameters(), lr=LEARNING_RATE)
 
 # See what the scores are before training
 # Note that element i,j of the output is the score for tag j for word i.
@@ -81,7 +66,7 @@ with torch.no_grad():
     inputs = prepare_sequence(training_data[0][0])
     tag_scores = model(inputs)
 
-for epoch in range(300):  # again, normally you would NOT do 300 epochs, it is toy data
+for epoch in range(30):  # again, normally you would NOT do 300 epochs, it is toy data
     for sentence, tags in training_data:
         # print('sentence -> ' + str(sentence) + ', tag -> ' + str(tags))
         # Step 1. Remember that Pytorch accumulates gradients.
@@ -101,24 +86,21 @@ for epoch in range(300):  # again, normally you would NOT do 300 epochs, it is t
 
         # Step 3. Run our forward pass.
         tag_scores = model(sentence_in)
+        # print('tag_score', tag_scores)
 
         # Step 4. Compute the loss, gradients, and update the parameters by
         #  calling optimizer.step()
         loss = loss_function(tag_scores, targets)
         # print_fancy(epoch, sentence_in, targets, tag_scores, loss)
-        print('loss -> ', loss)
         loss.backward()
         optimizer.step()
+    print('loss -> ', loss.item())
 
 # See what the scores are after training
 with torch.no_grad():
     inputs = prepare_sequence(training_data[0][0])
+    label = prepare_sequence(training_data[0][1])
     tag_scores = model(inputs)
-
-    # The sentence is "the dog ate the apple".  i,j corresponds to score for tag j
-    # for word i. The predicted tag is the maximum scoring tag.
-    # Here, we can see the predicted sequence below is 0 1 2 0 1
-    # since 0 is index of the maximum value of row 1,
-    # 1 is the index of maximum value of row 2, etc.
-    # Which is DET NOUN VERB DET NOUN, the correct sequence!
-    #print(tag_scores)
+    print('Inputs: ', inputs)
+    print('Label', label)
+    print('Prediction', tag_scores)
