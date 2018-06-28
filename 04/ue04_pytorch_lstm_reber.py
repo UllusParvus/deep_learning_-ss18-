@@ -13,11 +13,6 @@ def print_fancy(*args):
 
 torch.manual_seed(1)
 def prepare_sequence(seq):
-    # idxs = [to_ix[w] for w in seq]
-    # print('*'*40)
-    # print('seq -> ' + str(seq) + ', to_ix -> ' +str(to_ix))
-    # print('idxs', idxs)
-    #print('tensor -> ' + str(torch.tensor(idxs, dtype=torch.long)))
     return torch.tensor([seq], dtype=torch.float)
 
 # training_data = [
@@ -38,7 +33,7 @@ training_data = get_n_examples(500, 8)
 # These will usually be more like 32 or 64 dimensional.
 # We will keep them small, so we can see how the weights change as we train.
 EMBEDDING_DIM = 7
-HIDDEN_DIM = 7
+HIDDEN_DIM = 1000
 
 class LSTMTagger(nn.Module):
 
@@ -69,7 +64,7 @@ class LSTMTagger(nn.Module):
         #print('embeds -> ' + str(embeds))
         lstm_out, self.hidden = self.lstm(sentence, self.hidden)
         tag_space = self.hidden2tag(lstm_out)
-        tag_scores = F.log_softmax(tag_space, dim=-3)
+        tag_scores = F.log_softmax(tag_space, dim=1)
         return tag_scores
 
 #print('vocab size -> ' + str(len(word_to_ix)))
@@ -77,7 +72,7 @@ class LSTMTagger(nn.Module):
 # model = LSTMTagger(EMBEDDING_DIM, HIDDEN_DIM, len(word_to_ix), len(tag_to_ix))
 model = LSTMTagger(EMBEDDING_DIM, HIDDEN_DIM, 7, 7)
 loss_function = nn.MSELoss()
-optimizer = optim.SGD(model.parameters(), lr=0.1)
+optimizer = optim.SGD(model.parameters(), lr=1.01)
 
 # See what the scores are before training
 # Note that element i,j of the output is the score for tag j for word i.
@@ -97,6 +92,7 @@ for epoch in range(300):  # again, normally you would NOT do 300 epochs, it is t
         # detaching it from its history on the last instance.
         model.hidden = model.init_hidden()
 
+        # for letter, probs in zip(sentence, tags):
         # Step 2. Get our inputs ready for the network, that is, turn them into
         # Tensors of word indices.
         #print(word_to_ix)
@@ -109,7 +105,8 @@ for epoch in range(300):  # again, normally you would NOT do 300 epochs, it is t
         # Step 4. Compute the loss, gradients, and update the parameters by
         #  calling optimizer.step()
         loss = loss_function(tag_scores, targets)
-        print_fancy(epoch, sentence_in, targets, tag_scores, loss)
+        # print_fancy(epoch, sentence_in, targets, tag_scores, loss)
+        print('loss -> ', loss)
         loss.backward()
         optimizer.step()
 
