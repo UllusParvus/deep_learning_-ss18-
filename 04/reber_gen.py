@@ -44,7 +44,7 @@ def generateSequences(minLength):
             inchars.append(transitions[1][i])
             outchars.append(transitions[1])
             node = transitions[0][i]
-        if len(inchars) > minLength:
+        if len(inchars) == minLength:
             return inchars, outchars
 
 
@@ -78,7 +78,8 @@ def get_n_examples(n, minLength=10):
         examples.append(get_one_example(minLength))
     return examples
 
+
 if __name__ == '__main__':
-    train_data = get_n_examples(5)
+    train_data = get_n_examples(1000, 7)
     print(train_data[0][0])
     print(train_data[0][1])
