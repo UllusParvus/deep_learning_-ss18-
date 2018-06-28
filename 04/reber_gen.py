@@ -60,8 +60,8 @@ def get_one_example(minLength):
             outpt[chars.find(oo)] = 1.
         inseq.append(inpt)
         outseq.append(outpt)
-    inseq.append(get_char_one_hot(('E',)))
-    outseq.append(get_char_one_hot(()))
+    inseq.append(get_char_one_hot(('E',))[0])
+    outseq.append(get_char_one_hot(())[0])
     return inseq, outseq
 
 

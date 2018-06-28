@@ -2,31 +2,43 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
+from reber_gen import get_n_examples
+
+def print_fancy(*args):
+    print('-'*100)
+    for a in args:
+        print(a)
+        print('*'*100)
+    print('-'*100)
 
 torch.manual_seed(1)
-def prepare_sequence(seq, to_ix):
-    #('seq -> ' + str(seq) + ', to_ix -> ' +str(to_ix))
-    idxs = [to_ix[w] for w in seq]
+def prepare_sequence(seq):
+    # idxs = [to_ix[w] for w in seq]
+    # print('*'*40)
+    # print('seq -> ' + str(seq) + ', to_ix -> ' +str(to_ix))
+    # print('idxs', idxs)
     #print('tensor -> ' + str(torch.tensor(idxs, dtype=torch.long)))
-    return torch.tensor(idxs, dtype=torch.long)
+    return torch.tensor([seq], dtype=torch.float)
 
-training_data = [
-    ("The dog ate the apple".split(), ["DET", "NN", "V", "DET", "NN"]),
-    ("Everybody read that book".split(), ["NN", "V", "DET", "NN"])
-]
+# training_data = [
+#    ("The dog ate the apple".split(), ["DET", "NN", "V", "DET", "NN"]),
+#    ("Everybody read that book".split(), ["NN", "V", "DET", "NN"])
+# ]
 
-word_to_ix = {}
-for sent, tags in training_data:
-    for word in sent:
-        if word not in word_to_ix:
-            word_to_ix[word] = len(word_to_ix)
+training_data = get_n_examples(500, 8)
+
+# word_to_ix = {}
+# for sent, tags in training_data:
+#     for word in sent:
+#         if word not in word_to_ix:
+#             word_to_ix[word] = len(word_to_ix)
 #print(word_to_ix)
-tag_to_ix = {"DET": 0, "NN": 1, "V": 2}
+# tag_to_ix = {"DET": 0, "NN": 1, "V": 2}
 
 # These will usually be more like 32 or 64 dimensional.
 # We will keep them small, so we can see how the weights change as we train.
-EMBEDDING_DIM = 6
-HIDDEN_DIM = 6
+EMBEDDING_DIM = 7
+HIDDEN_DIM = 7
 
 class LSTMTagger(nn.Module):
 
@@ -34,7 +46,7 @@ class LSTMTagger(nn.Module):
         super(LSTMTagger, self).__init__()
         self.hidden_dim = hidden_dim
 
-        self.word_embeddings = nn.Embedding(vocab_size, embedding_dim)
+        # self.word_embeddings = nn.Embedding(vocab_size, embedding_dim)
 
         # The LSTM takes word embeddings as inputs, and outputs hidden states
         # with dimensionality hidden_dim.
@@ -49,36 +61,34 @@ class LSTMTagger(nn.Module):
         # Refer to the Pytorch documentation to see exactly
         # why they have this dimensionality.
         # The axes semantics are (num_layers, minibatch_size, hidden_dim)
-        return (torch.zeros(1, 1, self.hidden_dim),
-                torch.zeros(1, 1, self.hidden_dim))
+        return (torch.zeros(1, 8, self.hidden_dim),
+                torch.zeros(1, 8, self.hidden_dim))
 
     def forward(self, sentence):
-        embeds = self.word_embeddings(sentence)
+        # embeds = self.word_embeddings(sentence)
         #print('embeds -> ' + str(embeds))
-        lstm_out, self.hidden = self.lstm(
-            embeds.view(len(sentence), 1, -1), self.hidden)
-        tag_space = self.hidden2tag(lstm_out.view(len(sentence), -1))
-        tag_scores = F.log_softmax(tag_space, dim=1)
+        lstm_out, self.hidden = self.lstm(sentence, self.hidden)
+        tag_space = self.hidden2tag(lstm_out)
+        tag_scores = F.log_softmax(tag_space, dim=-3)
         return tag_scores
 
 #print('vocab size -> ' + str(len(word_to_ix)))
 
-model = LSTMTagger(EMBEDDING_DIM, HIDDEN_DIM, len(word_to_ix), len(tag_to_ix))
-loss_function = nn.NLLLoss()
+# model = LSTMTagger(EMBEDDING_DIM, HIDDEN_DIM, len(word_to_ix), len(tag_to_ix))
+model = LSTMTagger(EMBEDDING_DIM, HIDDEN_DIM, 7, 7)
+loss_function = nn.MSELoss()
 optimizer = optim.SGD(model.parameters(), lr=0.1)
 
 # See what the scores are before training
 # Note that element i,j of the output is the score for tag j for word i.
 # Here we don't need to train, so the code is wrapped in torch.no_grad()
 with torch.no_grad():
-    inputs = prepare_sequence(training_data[0][0], word_to_ix)
-    #print(word_to_ix)
+    inputs = prepare_sequence(training_data[0][0])
     tag_scores = model(inputs)
-    #print(tag_scores)
 
 for epoch in range(300):  # again, normally you would NOT do 300 epochs, it is toy data
     for sentence, tags in training_data:
-        print('sentence -> ' + str(sentence) + ', tag -> ' + str(tags))
+        # print('sentence -> ' + str(sentence) + ', tag -> ' + str(tags))
         # Step 1. Remember that Pytorch accumulates gradients.
         # We need to clear them out before each instance
         model.zero_grad()
@@ -90,8 +100,8 @@ for epoch in range(300):  # again, normally you would NOT do 300 epochs, it is t
         # Step 2. Get our inputs ready for the network, that is, turn them into
         # Tensors of word indices.
         #print(word_to_ix)
-        sentence_in = prepare_sequence(sentence, word_to_ix)
-        targets = prepare_sequence(tags, tag_to_ix)
+        sentence_in = prepare_sequence(sentence)
+        targets = prepare_sequence(tags)
 
         # Step 3. Run our forward pass.
         tag_scores = model(sentence_in)
@@ -99,12 +109,13 @@ for epoch in range(300):  # again, normally you would NOT do 300 epochs, it is t
         # Step 4. Compute the loss, gradients, and update the parameters by
         #  calling optimizer.step()
         loss = loss_function(tag_scores, targets)
+        print_fancy(epoch, sentence_in, targets, tag_scores, loss)
         loss.backward()
         optimizer.step()
 
 # See what the scores are after training
 with torch.no_grad():
-    inputs = prepare_sequence(training_data[0][0], word_to_ix)
+    inputs = prepare_sequence(training_data[0][0])
     tag_scores = model(inputs)
 
     # The sentence is "the dog ate the apple".  i,j corresponds to score for tag j
@@ -113,4 +124,4 @@ with torch.no_grad():
     # since 0 is index of the maximum value of row 1,
     # 1 is the index of maximum value of row 2, etc.
     # Which is DET NOUN VERB DET NOUN, the correct sequence!
-    print(tag_scores)
+    #print(tag_scores)
