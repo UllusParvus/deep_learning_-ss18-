@@ -94,14 +94,7 @@ def main():
         outputfile.write(str(o) + "\n")
     #~ outputfile.close()
 
-def generate(seq_len, anzahl, filename):
-    if(len(sys.argv) < 4):
-        print("Use " + sys.argv[0] + " [Sequenzlaenge] [anzahl] [outfilename]")
-        exit()
-    seqlen = int(sys.argv[1])
-    anzahl = int(sys.argv[2])
-    filename = sys.argv[3]
-
+def generate(seqlen, anzahl, filename):
     if(seqlen < 5):
         print("Seqlen to small")
         exit()
