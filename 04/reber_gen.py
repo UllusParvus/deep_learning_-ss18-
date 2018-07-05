@@ -4,6 +4,8 @@ import numpy as np
 import torch
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms, utils
+import os.path
+from reber_generator import generate
 
 chars = 'BTSXPVE'
 
@@ -122,16 +124,20 @@ def load_data(filename):
 class ReberDataset(Dataset):
     def __init__(self, num, length, test):
         self.test = test
-        data = load_data('./data10000_length_16_jodani')
+
+        fname = './data10000_length_{}'.format(length)
+        if not os.path.isfile(fname):
+            generate(length, 10000, fname)
+        data = load_data(fname)
         length_test_data = 500
         self.test_data = data[:length_test_data]
         self.training_data = data[length_test_data:]
 
     def __getitem__(self, index):
         if self.test:
-            return torch.tensor([self.test_data[index][0]]), torch.tensor([self.test_data[index][1]])
+            return torch.tensor(self.test_data[index][0]), torch.tensor(self.test_data[index][1])
         else:
-            return torch.tensor([self.training_data[index][0]]), torch.tensor([self.training_data[index][1]])
+            return torch.tensor(self.training_data[index][0]), torch.tensor(self.training_data[index][1])
             
     def __len__(self):
         if self.test:

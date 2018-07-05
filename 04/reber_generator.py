@@ -89,5 +89,48 @@ def main():
         outputfile.write(str(o) + "\n")
     #~ outputfile.close()
 
+def generate(seq_len, anzahl, filename):
+    if(len(sys.argv) < 4):
+        print("Use " + sys.argv[0] + " [Sequenzlaenge] [anzahl] [outfilename]")
+        exit()
+    seqlen = int(sys.argv[1])
+    anzahl = int(sys.argv[2])
+    filename = sys.argv[3]
+
+    if(seqlen < 5):
+        print("Seqlen to small")
+        exit()
+
+    stop = Value('d', 0)
+    lenght = Value('d', seqlen)
+    threadAnz = 8
+    queues = []
+    processes = []
+    for i in range(0, threadAnz):
+        queue = Queue(100)
+        queues.append(queue)
+        p = Process(target=generatorProzess, args=(queue,stop,lenght))
+        processes.append(p)
+        p.start()
+
+    output = set()
+    while(1):
+        for queue in queues:
+            string = queue.get()
+            output.add(string)
+            print("hit", len(output))
+            if(len(output) >= anzahl):
+                break
+        if(len(output) >= anzahl):
+            print("break")
+            for p in processes:
+                p.terminate()
+            break
+
+    outputfile = open(filename, 'w')
+    for o in output:
+        outputfile.write(str(o) + "\n")
+    #~ outputfile.close()
+
 if __name__ == "__main__":
     main()

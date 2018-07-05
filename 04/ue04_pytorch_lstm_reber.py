@@ -7,6 +7,16 @@ import numpy as np
 import pickle
 from reber_gen import ReberDataset
 
+mini_batch_sizes = [1, 5, 10, 50, 100]
+EMBEDDING_DIM = 7
+HIDDEN_DIM = 12
+MINI_BATCH_SIZE = 5
+WORD_SIZE = 30
+LEARNING_RATE = 0.1
+NUM_TEST = 500
+MOMENTUM = 0.9
+OPTIMIZER = ['SGD', 'RMSProp', 'AdaDelta'][2]
+
 def print_fancy(*args):
     print('-'*100)
     for a in args:
@@ -16,8 +26,6 @@ def print_fancy(*args):
 
 # torch.manual_seed(1)
 def prepare_sequence(seq):
-    print('seq', len(seq))
-    print('seq', len(seq[0]))
     return torch.tensor(seq, dtype=torch.float)
 
 def get_num_correct_classified(x, y):
@@ -43,42 +51,20 @@ def print_procentage_correctly_classified(model, data):
     print('prozent', correct/max_num)
     return correct/max_num
 
-EMBEDDING_DIM = 7
-HIDDEN_DIM = 12
-MINI_BATCH_SIZE = 5
-WORD_SIZE = 30
-LEARNING_RATE = 0.0001
-NUM_TEST = 500
-
-
-train_dataset = ReberDataset(10000-NUM_TEST, WORD_SIZE, test=False)
-test_dataset = ReberDataset(NUM_TEST, WORD_SIZE, test=True)
-
-trainloader = torch.utils.data.DataLoader(train_dataset, batch_size=MINI_BATCH_SIZE,
-                                            shuffle=True, num_workers=2)
-
-testloader = torch.utils.data.DataLoader(test_dataset, batch_size=MINI_BATCH_SIZE,
-                                            shuffle=False, num_workers=2)
-
 class LSTMTagger(nn.Module):
 
     def __init__(self, embedding_dim, hidden_dim, vocab_size, tagset_size):
         super(LSTMTagger, self).__init__()
         self.hidden_dim = hidden_dim
 
-        # self.word_embeddings = nn.Embedding(vocab_size, embedding_dim)
+        self.lstm = nn.LSTM(embedding_dim, hidden_dim)
 
-        # The LSTM takes word embeddings as inputs, and outputs hidden states
-        # with dimensionality hidden_dim.
-        self.lstm = nn.LSTM(embedding_dim, hidden_dim) # batch_first=True
-
-        # The linear layer that maps from hidden state space to tag space
         self.hidden2tag = nn.Linear(hidden_dim, tagset_size)
         self.hidden = self.init_hidden()
 
     def init_hidden(self):
-        return (torch.zeros(1, MINI_BATCH_SIZE, self.hidden_dim),
-                torch.zeros(1, MINI_BATCH_SIZE, self.hidden_dim))
+        return (torch.zeros(1, WORD_SIZE, self.hidden_dim),
+                torch.zeros(1, WORD_SIZE, self.hidden_dim))
 
     def forward(self, sentence):
         lstm_out, self.hidden = self.lstm(sentence, self.hidden)
@@ -88,43 +74,49 @@ class LSTMTagger(nn.Module):
         return activation
 
 
-# model = LSTMTagger(EMBEDDING_DIM, HIDDEN_DIM, len(word_to_ix), len(tag_to_ix))
-model = LSTMTagger(EMBEDDING_DIM, HIDDEN_DIM, 7, 7)
-loss_function = nn.MSELoss()
-optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
+train_dataset = ReberDataset(10000-NUM_TEST, WORD_SIZE, test=False)
+test_dataset = ReberDataset(NUM_TEST, WORD_SIZE, test=True)
 
-print('Optimizer Adam, Learning Rate {}, Batch Size 1'.format(LEARNING_RATE))
+for mbs in mini_batch_sizes:
+    
+    model = LSTMTagger(EMBEDDING_DIM, HIDDEN_DIM, 7, 7)
+    if OPTIMIZER == 'SGD':
+        optimizer = optim.SGD(model.parameters(), lr=LEARNING_RATE, momentum=MOMENTUM)
+    elif OPTIMIZER == 'RMSProp':
+        optimizer = optim.RMSprop(model.parameters(), lr=LEARNING_RATE)
+    elif OPTIMIZER == 'AdaDelta':
+        optimizer = optim.Adadelta(model.parameters(), lr=LEARNING_RATE)
+    else:
+        OPTIMIZER = 'Adam'
+        optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
+    
+    trainloader = torch.utils.data.DataLoader(train_dataset, batch_size=mbs,
+                                                shuffle=True, num_workers=2)
 
-for epoch in range(10):  # again, normally you would NOT do 300 epochs, it is toy data
-    for sentence, tags in trainloader:
-        # print('sentence -> ' + str(sentence) + ', tag -> ' + str(tags))
-        # Step 1. Remember that Pytorch accumulates gradients.
-        # We need to clear them out before each instance
-        model.zero_grad()
+    testloader = torch.utils.data.DataLoader(test_dataset, batch_size=mbs,
+                                                shuffle=False, num_workers=2)
 
-        # Also, we need to clear out the hidden state of the LSTM,
-        # detaching it from its history on the last instance.
-        model.hidden = model.init_hidden()
+    loss_function = nn.MSELoss()
 
-        # for letter, probs in zip(sentence, tags):
-        # Step 2. Get our inputs ready for the network, that is, turn them into
-        # Tensors of word indices.
-        #print(word_to_ix)
-        sentence_in = prepare_sequence(sentence)
-        targets = prepare_sequence(tags)
+    print('-|-'*100)
+    print('Optimizer {}, Learning Rate {}, Batch Size {}'.format(OPTIMIZER, LEARNING_RATE, mbs))
 
-        # Step 3. Run our forward pass.
-        tag_scores = model(sentence_in)
-        # print('tag_score', tag_scores)
+    for epoch in range(10):  # again, normally you would NOT do 300 epochs, it is toy data
+        for sentence, tags in trainloader:
+            model.zero_grad()
 
-        # Step 4. Compute the loss, gradients, and update the parameters by
-        #  calling optimizer.step()
-        loss = loss_function(tag_scores, targets)
-        # print_fancy(epoch, sentence_in, targets, tag_scores, loss)
-        loss.backward()
-        optimizer.step()
-    print('Epoch {}'.format(epoch))
-    print('loss -> ', loss.item())
+            model.hidden = model.init_hidden()
+
+            sentence_in = prepare_sequence(sentence)
+            targets = prepare_sequence(tags)
+
+            tag_scores = model(sentence_in)
+
+            loss = loss_function(tag_scores, targets)
+            loss.backward()
+            optimizer.step()
+        print('Epoch {}'.format(epoch))
+        print('loss -> ', loss.item())
 
     # See what the scores are after training
     print('Test Data:')
