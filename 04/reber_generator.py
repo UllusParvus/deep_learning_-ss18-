@@ -44,11 +44,11 @@ class cell_6(cell):
     def appendString(self, string):
         return string + "E"
 
-def generatorProzess(queue,stop, lenght):
-    lenght = lenght.value
+def generatorProzess(queue, stop, length):
+    length = length.value
     while(stop != 1):
         string = cell_1().appendString("B")
-        if(len(string) == lenght):
+        if(len(string) == length):
             queue.put(string)
 
 def main():
@@ -100,14 +100,14 @@ def generate(seqlen, anzahl, filename):
         exit()
 
     stop = Value('d', 0)
-    lenght = Value('d', seqlen)
+    length = Value('d', seqlen)
     threadAnz = 8
     queues = []
     processes = []
     for i in range(0, threadAnz):
         queue = Queue(100)
         queues.append(queue)
-        p = Process(target=generatorProzess, args=(queue,stop,lenght))
+        p = Process(target=generatorProzess, args=(queue,stop,length))
         processes.append(p)
         p.start()
 

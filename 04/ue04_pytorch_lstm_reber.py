@@ -50,9 +50,10 @@ def print_procentage_correctly_classified(model, data):
     print('prozent', correct/max_num)
     return correct/max_num
 
+
 class LSTMTagger(nn.Module):
 
-    def __init__(self, embedding_dim, hidden_dim, vocab_size, tagset_size):
+    def __init__(self, embedding_dim, hidden_dim, tagset_size):
         super(LSTMTagger, self).__init__()
         self.hidden_dim = hidden_dim
 
@@ -78,7 +79,7 @@ test_dataset = ReberDataset(NUM_TEST, WORD_SIZE, test=True)
 
 for mbs in mini_batch_sizes:
     
-    model = LSTMTagger(EMBEDDING_DIM, HIDDEN_DIM, 7, 7)
+    model = LSTMTagger(EMBEDDING_DIM, HIDDEN_DIM, 7)
     if OPTIMIZER == 'SGD':
         optimizer = optim.SGD(model.parameters(), lr=LEARNING_RATE, momentum=MOMENTUM)
     elif OPTIMIZER == 'RMSProp':
@@ -100,7 +101,7 @@ for mbs in mini_batch_sizes:
     print('-|-'*100)
     print('Optimizer {}, Learning Rate {}, Batch Size {}'.format(OPTIMIZER, LEARNING_RATE, mbs))
 
-    for epoch in range(10):  # again, normally you would NOT do 300 epochs, it is toy data
+    for epoch in range(10):
         for sentence, tags in trainloader:
             model.zero_grad()
 
