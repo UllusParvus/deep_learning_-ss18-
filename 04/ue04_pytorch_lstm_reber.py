@@ -2,10 +2,9 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-from reber_gen import get_n_examples
 import numpy as np
 import pickle
-from reber_gen import ReberDataset
+from reber_generator import ReberDataset
 
 mini_batch_sizes = [1, 5, 10, 50, 100]
 EMBEDDING_DIM = 7
