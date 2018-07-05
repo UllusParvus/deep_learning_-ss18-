@@ -1,6 +1,9 @@
 #!/usr/bin/python
 
 import numpy as np
+import torch
+from torch.utils.data import Dataset, DataLoader
+from torchvision import transforms, utils
 
 chars = 'BTSXPVE'
 
@@ -78,6 +81,63 @@ def get_n_examples(n, minLength=10):
         examples.append(get_one_example(minLength))
     return examples
 
+alphabet = 'BTSXPVE'
+trans_dict = {a:np.eye(7)[i] for i, a in enumerate(alphabet)}
+
+graph = [[(1, 5), ('T', 'P')], [(1, 2), ('S', 'X')], \
+         [(3, 5), ('S', 'X')], [(6,), ('E')], \
+         [(3, 2), ('V', 'P')], [(4, 5), ('V', 'T')]]
+
+def get_y_label(letter, state):
+    next_states, letters = graph[state]
+    if letter in letters:
+        idx = letters.index(letter)
+        next_state = next_states[idx]
+
+        if next_state == 6: # End State:
+            return -1, [0.0]*len(alphabet)
+        
+        _, new_letters = graph[next_state]
+        label = np.vstack([trans_dict[a] for a in new_letters]).sum(axis=0).tolist()
+        return next_state, label
+    else:
+        return -1, [0.0]*len(alphabet)
+
+def load_data(filename):
+    data = []
+    with open(filename, 'r') as file:
+        for word in file:
+            word = word.rstrip()
+            encoded_x = []
+            encoded_y = []
+            state = 0
+            for letter in word:
+                state, label = get_y_label(letter, state)
+                encoded_x.append(trans_dict[letter])
+                encoded_y.append(label)
+            data.append((encoded_x, encoded_y))
+    return data
+
+
+class ReberDataset(Dataset):
+    def __init__(self, num, length, test):
+        self.test = test
+        data = load_data('./data10000_length_16_jodani')
+        length_test_data = 500
+        self.test_data = data[:length_test_data]
+        self.training_data = data[length_test_data:]
+
+    def __getitem__(self, index):
+        if self.test:
+            return torch.tensor([self.test_data[index][0]]), torch.tensor([self.test_data[index][1]])
+        else:
+            return torch.tensor([self.training_data[index][0]]), torch.tensor([self.training_data[index][1]])
+            
+    def __len__(self):
+        if self.test:
+            return len(self.test_data)
+        else:
+            return len(self.training_data)
 
 if __name__ == '__main__':
     train_data = get_n_examples(1000, 7)
